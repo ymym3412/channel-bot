@@ -42,14 +42,16 @@ $ python channel-bot.py
 
 # Example
 ## チャンネル一覧の表示
-`config.ini`の`command`で指定した文字列がroomで指定したチャンネルで使用されると、チャンネルの一覧が表示されます。
+`config.ini`の`command`で指定した文字列がroomで指定したチャンネルで使用されると、チャンネルの一覧と各チャンネルのpurposeが表示されます。
 ### 「channels」を指定した場合
 ```
 user:channels
 bot:チャンネル一覧
-    general
-    random
-    sample-room
+    general : This channel is for team-wide...
+
+    random : A place for non-work banter, links, articles ...
+    
+    sample-room : {purpose of sample-room}
 ```
 
 ## 新しく作成されたチャンネルの通知
