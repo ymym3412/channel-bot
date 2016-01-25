@@ -16,7 +16,9 @@ def is_channel_created_event(res):
 def convert_channels_to_text(channels):
     text_list = [u"チャンネル一覧:hatched_chick:\n"]
     for channel in channels:
-        text_list.append(channel["name"] + "\n")
+        purpose = channel["purpose"]
+        line = channel["name"] + " : " + purpose["value"] + "\n\n"
+        text_list.append(line)
     return "".join(text_list)
 
 
