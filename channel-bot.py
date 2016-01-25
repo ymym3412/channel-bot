@@ -15,7 +15,7 @@ def is_channel_created_event(res):
 
 def convert_channels_to_text(channels):
     text_list = [u"チャンネル一覧:hatched_chick:\n"]
-    for channel in channels["channels"]:
+    for channel in channels:
         text_list.append(channel["name"] + "\n")
     return "".join(text_list)
 
@@ -33,8 +33,9 @@ if sc.rtm_connect():
         for res in response:
             if "type" in res:
                 if is_channels_command(res):
-                    channels = json.loads(sc.api_call("channels.list"))
-                    text = convert_channels_to_text(channels)
+                    all_channels = json.loads(sc.api_call("channels.list"))
+                    unarchived_channels = [channel for channel in all_channels["channels"] if channel["is_archived"] == False]
+                    text = convert_channels_to_text(unarchived_channels)
                     sc.rtm_send_message(room, text)
                     time.sleep(1)
                 elif is_channel_created_event(res):

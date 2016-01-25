@@ -24,7 +24,7 @@ $ pip install -r requirements.txt
 ```
 
 # Usage
-confgi.iniに必要な情報を記述します
+config.iniに必要な情報を記述します
 ```
 token={your slack token or bot token}
 command={show all channels}
