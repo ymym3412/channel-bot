@@ -6,7 +6,7 @@ from ConfigParser import SafeConfigParser
 
 
 def is_channels_command(res):
-    return (res["type"] == "message") and ("text" in res) and (command in res["text"])
+    return (res["type"] == "message") and ("text" in res) and (command == res["text"])
 
 
 def is_channel_created_event(res):
@@ -33,6 +33,7 @@ if sc.rtm_connect():
     while True:
         response = sc.rtm_read()
         for res in response:
+            print res
             if "type" in res:
                 if is_channels_command(res):
                     all_channels = json.loads(sc.api_call("channels.list"))
