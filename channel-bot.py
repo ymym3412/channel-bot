@@ -17,9 +17,9 @@ def convert_channels_to_text(channels):
     text_list = [u"チャンネル一覧:hatched_chick:\n"]
     for channel in channels["channels"]:
         purpose = channel["purpose"]
-        line = channel["name"] + " : " + purpose["value"] + "\n\n"
+        line = "#" + channel["name"] + " : " + purpose["value"]+ "\n\n"
         text_list.append(line)
-    return "".join(text_list)
+    return "".join(text_list).encode("utf-8")
 
 
 config = SafeConfigParser()
@@ -33,17 +33,16 @@ if sc.rtm_connect():
     while True:
         response = sc.rtm_read()
         for res in response:
-            print res
             if "type" in res:
                 if is_channels_command(res):
                     channels = json.loads(sc.api_call("channels.list", exclude_archived="1"))
                     text = convert_channels_to_text(channels)
-                    sc.rtm_send_message(room, text)
+                    sc.api_call("chat.postMessage", channel=room, text=text, link_names="1", as_user="1")
                     time.sleep(1)
                 elif is_channel_created_event(res):
                     channel_info = res["channel"]
-                    text = "New Channel!:sparkles:\n" + channel_info["name"]
-                    sc.rtm_send_message(room, text)
+                    text = "New Channel!:sparkles:\n" + "#" + channel_info["name"]
+                    sc.api_call("chat.postMessage", channel=room, text=text, link_names="1", as_user="1")
                     time.sleep(1)
 else:
     print "Connection Failed, invlalid token?"
