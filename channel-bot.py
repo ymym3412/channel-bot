@@ -27,7 +27,7 @@ def convert_channels_to_text(channels):
     text_list = [u"チャンネル一覧:hatched_chick:\n"]
     for channel in channels["channels"]:
         purpose = channel["purpose"]
-        line = "#" + channel["name"] + " : " + purpose["value"]+ "\n\n"
+        line = "#" + channel["name"] + " : " + channel["name"] + " : " + purpose["value"]+ "\n\n"
         text_list.append(line)
     return "".join(text_list).encode("utf-8")
 
@@ -51,9 +51,11 @@ if sc.rtm_connect():
                     sc.api_call("chat.postMessage", channel=room, text=text, link_names="1", as_user="1")
                     time.sleep(1)
                 elif is_channel_created_event(res):
-                    channel_info = res["channel"]
-                    text = "New Channel!:sparkles:\n" + "#" + channel_info["name"]
-                    sc.api_call("chat.postMessage", channel=room, text=text, link_names="1", as_user="1")
+                    channel = res["channel"]
+                    time.sleep(2)
+                    channel_info = json.loads(sc.api_call("channels.info", channel=channel["id"]))
+                    text = "New Channel!:sparkles:\n" + "#" + channel["name"] + " : " + channel["name"] + " : " + channel_info["channel"]["purpose"]["value"]
+                    sc.api_call("chat.postMessage", channel=room, text=text.encode("utf-8"), link_names="1", as_user="1")
                     time.sleep(1)
                 elif is_direct_message(res, json.loads(sc.api_call("im.list"))["ims"]):
                     channels = json.loads(sc.api_call("channels.list", exclude_archived="1"))
