@@ -4,6 +4,7 @@ Slackの中のチャンネル情報を通知してくれるbotです。
 
 - 指定した文字列が打ち込まれるとチャンネル一覧を表示する
 - 新しいチャンネルが作成されると、チャンネル名を通知する
+- 新しいemojiが追加されると、チャンネルに通知する
 
 チャンネル一覧と新しいチャンネル通知はリンクとして表示されるため、すぐにそのチャンネルを見に行くことができます。
 Slackの[Real Time Messaging API](https://api.slack.com/rtm)を使用しており、
@@ -62,4 +63,11 @@ Slack内で新しいチャンネルが作成されると、指定されたチャ
 ```
 bot:New Channel!
     #new-channel-name
+```
+
+## 新しく追加されたemojiの通知
+Slackに新しいemojiが追加されると、emoji名とオリジナルのファイルを表示します。
+```
+bot:New Stamp!`:zoi:`
+    Original: https://emoji.slack-edge.com/T03JDMZLZ/zoi1/c3e... 
 ```

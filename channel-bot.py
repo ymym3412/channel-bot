@@ -23,6 +23,10 @@ def is_direct_message(res, im_list):
     return (res["type"] == "message") and exist_list and ("text" in res) and (command == res["text"])
 
 
+def is_emoji_changed_event(res):
+    return res["type"] == "emoji_changed" and res["subtype"] == "add"
+
+
 def convert_channels_to_text(channels):
     text_list = [u"チャンネル一覧:hatched_chick:\n"]
     for channel in channels["channels"]:
@@ -62,5 +66,9 @@ if sc.rtm_connect():
                     text = convert_channels_to_text(channels)
                     sc.api_call("chat.postMessage", channel=res["channel"], text=text, link_names="1", as_user="1")
                     time.sleep(1)
+                elif is_emoji_changed_event(res):
+                    text = "New Stamp!`:{}:`:sparkles:\nOriginal: {}".format(res["name"], res["value"])
+                    sc.api_call("chat.postMessage", channel=room, text=text, as_user="1")
+
 else:
     print "Connection Failed, invlalid token?"
