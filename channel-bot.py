@@ -10,6 +10,7 @@ from logbook import Logger
 from logbook import RotatingFileHandler
 from logbook import StreamHandler
 
+SLACK_SECTION_NAME = "slack"
 logger = Logger("channel-bot")
 
 
@@ -45,8 +46,8 @@ def convert_channels_to_text(channels):
 
 
 def setup_logger(config):
-    if config.has_option("slack", "log_output"):
-        output_path = config.get("slack", "log_output")
+    if config.has_option(SLACK_SECTION_NAME, "log_output"):
+        output_path = config.get(SLACK_SECTION_NAME, "log_output")
         dir_path, file_name = os.path.split(output_path)
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
@@ -59,24 +60,24 @@ def setup_logger(config):
 
 
 def read_config(config):
-    error_message = "Please create 'slack' section and contain options."
+    error_message = "Please create '{}' section and contain options.".format(SLACK_SECTION_NAME)
     try:
         config.read("config.ini")
     except MissingSectionHeaderError:
         print error_message
         exit()
 
-    if not config.has_section("slack"):
+    if not config.has_section(SLACK_SECTION_NAME):
         print error_message
         exit()
 
 
 def parse_required_option(config, option):
-    if not config.has_option("slack", option):
-        print "Please setting '{}' option in {} section.".format(option, "slack")
+    if not config.has_option(SLACK_SECTION_NAME, option):
+        print "Please setting '{}' option in '{}' section.".format(option, SLACK_SECTION_NAME)
         exit()
 
-    return config.get("slack", option)
+    return config.get(SLACK_SECTION_NAME, option)
 
 
 config = SafeConfigParser()
