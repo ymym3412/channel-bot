@@ -65,17 +65,17 @@ def read_config(config):
         config.read("config.ini")
     except MissingSectionHeaderError:
         print error_message
-        exit()
+        sys.exit()
 
     if not config.has_section(SLACK_SECTION_NAME):
         print error_message
-        exit()
+        sys.exit()
 
 
 def parse_required_option(config, option):
     if not config.has_option(SLACK_SECTION_NAME, option):
         print "Please setting '{}' option in '{}' section.".format(option, SLACK_SECTION_NAME)
-        exit()
+        sys.exit()
 
     return config.get(SLACK_SECTION_NAME, option)
 
