@@ -1,8 +1,16 @@
 # coding:utf-8
-from slackclient import SlackClient
+import os
+import sys
 import time
 import json
 from ConfigParser import SafeConfigParser
+
+from slackclient import SlackClient
+from logbook import Logger
+from logbook import RotatingFileHandler
+from logbook import StreamHandler
+
+logger = Logger("channel-bot")
 
 
 def is_channels_message(res, channel_list):
@@ -36,18 +44,35 @@ def convert_channels_to_text(channels):
     return "".join(text_list).encode("utf-8")
 
 
+def setup_logger(config):
+    if config.has_option("slack", "log_output"):
+        output_path = config.get("slack", "log_output")
+        dir_path, file_name = os.path.split(output_path)
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+
+        file_handler = RotatingFileHandler(output_path, backup_count=5)
+        file_handler.push_application()
+    else:
+        stream_handler = StreamHandler(sys.stdout)
+        stream_handler.push_application()
+
+
 config = SafeConfigParser()
 config.read("config.ini")
+setup_logger(config)
 token = config.get("slack", "token")
 command = config.get("slack", "command")
 room = config.get("slack", "room")
 sc = SlackClient(token)
 
 if sc.rtm_connect():
+    logger.info("channel-bot is up")
+
     while True:
         response = sc.rtm_read()
         for res in response:
-            print res
+            logger.info(res)
             if "type" in res:
                 if is_channels_message(res, json.loads(sc.api_call("channels.list", exclude_archived="1"))["channels"]):
                     channels = json.loads(sc.api_call("channels.list", exclude_archived="1"))
@@ -71,4 +96,4 @@ if sc.rtm_connect():
                     sc.api_call("chat.postMessage", channel=room, text=text, as_user="1")
 
 else:
-    print "Connection Failed, invlalid token?"
+    logger.critical("Connection Failed, invalid token?")
