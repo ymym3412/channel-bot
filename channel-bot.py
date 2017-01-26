@@ -3,13 +3,14 @@ import os
 import sys
 import time
 import json
-from ConfigParser import SafeConfigParser
+from ConfigParser import SafeConfigParser, MissingSectionHeaderError
 
 from slackclient import SlackClient
 from logbook import Logger
 from logbook import RotatingFileHandler
 from logbook import StreamHandler
 
+SLACK_SECTION_NAME = "slack"
 logger = Logger("channel-bot")
 
 
@@ -45,8 +46,8 @@ def convert_channels_to_text(channels):
 
 
 def setup_logger(config):
-    if config.has_option("slack", "log_output"):
-        output_path = config.get("slack", "log_output")
+    if config.has_option(SLACK_SECTION_NAME, "log_output"):
+        output_path = config.get(SLACK_SECTION_NAME, "log_output")
         dir_path, file_name = os.path.split(output_path)
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
@@ -58,12 +59,33 @@ def setup_logger(config):
         stream_handler.push_application()
 
 
+def read_config(config):
+    error_message = "Please create '{}' section and contain options.".format(SLACK_SECTION_NAME)
+    try:
+        config.read("config.ini")
+    except MissingSectionHeaderError:
+        print error_message
+        sys.exit()
+
+    if not config.has_section(SLACK_SECTION_NAME):
+        print error_message
+        sys.exit()
+
+
+def parse_required_option(config, option):
+    if not config.has_option(SLACK_SECTION_NAME, option):
+        print "Please setting '{}' option in '{}' section.".format(option, SLACK_SECTION_NAME)
+        sys.exit()
+
+    return config.get(SLACK_SECTION_NAME, option)
+
+
 config = SafeConfigParser()
-config.read("config.ini")
+read_config(config)
+token = parse_required_option(config, "token")
+command = parse_required_option(config, "command")
+room = parse_required_option(config, "room")
 setup_logger(config)
-token = config.get("slack", "token")
-command = config.get("slack", "command")
-room = config.get("slack", "room")
 sc = SlackClient(token)
 
 if sc.rtm_connect():
